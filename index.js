@@ -31,11 +31,14 @@ const Task = mongoose.model('Task', taskSchema);
 
 // READ: Ask Mongo for all tasks
 app.get('/tasks', async (req, res) => {
-  // We grab all tasks, but strip away Mongo's internal data so Angular doesn't get confused
-  const tasks = await Task.find({}, '-_id id title completed'); 
-  res.json(tasks);
+  try {
+    const tasks = await Task.find({}, '-_id id title completed');
+    res.json(tasks);
+  } catch (error) {
+    console.error("Database Fetch Error:", error);
+    res.status(500).json({ message: "Cloud database is waking up, try refreshing!" });
+  }
 });
-
 // CREATE: Save a new task permanently
 app.post('/tasks', async (req, res) => {
   const newTask = new Task({
